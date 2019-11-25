@@ -62,14 +62,16 @@ class IdeaController extends Controller
         return $this->view->pick('add');
     }
 
-    public function voteAction()
-    {
-
-    }
-
-    public function rateAction()
+    public function rateAction($id)
     {
         
+        return $this->view->pick('rate');   
     }
+
+    public function voteAction()
+    {
+        return $this->view->pick('vote');   
+    }
+
 
 }
