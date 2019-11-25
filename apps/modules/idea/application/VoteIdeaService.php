@@ -19,7 +19,6 @@ class VoteIdeaService
         $ideaId = new IdeaId($request->id);
         $idea = $this->ideaRepository->byId($ideaId);
         $idea->vote();
-        var_dump($idea);
         $this->ideaRepository->save($idea);
 
         $response = new VoteIdeaResponse($idea);

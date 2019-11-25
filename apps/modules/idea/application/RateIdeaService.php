@@ -2,12 +2,10 @@
 
 namespace Idy\Idea\Application;
 
-use Idy\Idea\Domain\Model\IdeaDoesNotExistException;
 use Idy\Idea\Domain\Model\IdeaId;
 use Idy\Idea\Domain\Model\IdeaRepository;
 use Idy\Idea\Domain\Model\Rating;
 use Idy\Idea\Domain\Model\RatingRepository;
-use \Idy\Idea\Domain\Model\UserAlreadyRatedException;
 
 class RateIdeaService
 {

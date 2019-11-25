@@ -4,6 +4,9 @@ use Phalcon\Mvc\View;
 use Phalcon\Mvc\View\Engine\Volt;
 use Idy\Idea\Infrastructure\SqlIdeaRepository;
 use Idy\Idea\Infrastructure\SqlRatingRepository;
+use Idy\Idea\Infrastructure\SmtpMailRepository;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 $di['voltServiceMail'] = function($view) use ($di) {
 
@@ -51,6 +54,25 @@ $di['db'] = function () use ($di) {
     ]);
 };
 
+$di['smtp_mailer_client'] = function () use ($di) {
+    $config = $di->get('config');
+    $driver = $config->mail->driver;
+    $host = $config->mail->smtp->server;
+    $port = $config->mail->smtp->port;
+    $username = $config->mail->smtp->username;
+    $password = $config->mail->smtp->password;
+
+//    $mail = new $driver;
+    $mail = new PHPMailer(true);
+    $mail->isSMTP();
+    $mail->Host = $host;
+    $mail->Port = (int)$port;
+    $mail->SMTPAuth = isset($username);
+    $mail->Username = $username;
+    $mail->Password = $password;
+    return $mail;
+};
+
 $di->setShared('sql_idea_repository', function() use ($di) {
     $repo = new SqlIdeaRepository($di);
 
@@ -59,6 +81,17 @@ $di->setShared('sql_idea_repository', function() use ($di) {
 
 $di->setShared('sql_rating_repository', function() use ($di) {
     $repo = new SqlRatingRepository($di);
+
+    return $repo;
+});
+
+$di->setShared('smtp_mail_repository', function() use ($di) {
+    $config = $di->get('config');
+
+    $senderName = $config->mail->fromName;
+    $senderMail = $config->mail->fromEmail;
+
+    $repo = new SmtpMailRepository($di, $senderName, $senderMail);
 
     return $repo;
 });

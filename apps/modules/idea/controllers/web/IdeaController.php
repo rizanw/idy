@@ -12,6 +12,7 @@ use Idy\Idea\Application\RateIdeaRequest;
 use Idy\Idea\Application\RateIdeaService;
 use Idy\Idea\Application\VoteIdeaRequest;
 use Idy\Idea\Application\VoteIdeaService;
+use Idy\Idea\Application\SendRatingNotificationService;
 
 class IdeaController extends Controller
 {
@@ -20,17 +21,21 @@ class IdeaController extends Controller
     private $viewAllIdeasService;
     private $viewIdeaService;
     private $voteIdeaService;
+    private $sendRatingNotificationService;
 
     public function onConstruct()
     {
         $this->session = $this->di->getShared('session');
         $ideaRepository = $this->di->getShared('sql_idea_repository');
         $ratingRepository = $this->di->getShared('sql_rating_repository');
+        $mailRepository = $this->di->getShared('smtp_mail_repository');
         $this->createNewIdeaService = new CreateNewIdeaService($ideaRepository);
         $this->viewAllIdeasService = new ViewAllIdeasService($ideaRepository, $ratingRepository);
         $this->viewIdeaService = new ViewIdeaService($ideaRepository, $ratingRepository);
         $this->rateIdeaService = new RateIdeaService($ideaRepository, $ratingRepository);
         $this->voteIdeaService = new VoteIdeaService($ideaRepository);
+
+        $this->sendRatingNotificationService = new SendRatingNotificationService($mailRepository, $ideaRepository);
     }
 
     public function indexAction()
@@ -44,8 +49,8 @@ class IdeaController extends Controller
             'votedIdeas' => $votedIdeasByUser,
             'ideas' => $ideas
         ]);
-//        $this->session->remove('popup_status');
-//        $this->session->remove('popup_message');
+        $this->session->remove('popup_status');
+        $this->session->remove('popup_message');
 
         return $this->view->pick('home');
     }
@@ -74,6 +79,7 @@ class IdeaController extends Controller
 
     public function rateAction($ideaId)
     {
+
         if (!isset($ideaId)) {
             return $this->response->redirect('idea');
         }
@@ -82,6 +88,7 @@ class IdeaController extends Controller
             $ratingValue = $this->request->getPost('rating');
             $rateIdeaRequest = new RateIdeaRequest($ideaId, $ratingUser, $ratingValue);
             $this->rateIdeaService->execute($rateIdeaRequest);
+            $this->sendRatingNotificationService->execute($ideaId, $ratingValue);
 
             return $this->response->redirect("idea/rate/{$ideaId}");
         }
