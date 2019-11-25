@@ -7,17 +7,19 @@
 {% endblock %}
 
 {% block content %}
-
-<div class="sticky" style="margin-top:100px">
+<div class="container bg-white text-dark p-4 rounded">
     <h2>{{ idea.title() }}</h2>
-    <p> {{ idea.description() }}</p>
-    <div class="author">By {{ idea.author().name() }}</div>
-    <div class="email">{{ idea.author().email() }}</div>
-    <div class="rating">Ratings: {{ idea.averageRating()}} <a href="{{ url('idea/rate/') }}{{ idea.id().id() }}">Rate</a></div>
-    <div class="rating">Votes: {{ idea.votes() }} <a href="{{ url('idea/vote/') }}{{ idea.id().id() }}">Vote</a></div>
+    <div class="small">
+        <span>By {{ idea.author().name() }}</span>
+        <span class="font-italic">({{ idea.author().email() }})</span>
+        <span>|</span>
+        <span>Ratings: {{ idea.averageRating()}}</span>
+        <span>Votes: {{ idea.votes() }}</span>
+    </div>
+    <p class="pt-3 pb-4"> {{ idea.description() }}</p>
 </div>
 
-<div class="container bg-white text-dark p-2 rounded" style="margin-top: 20px">
+<div class="container bg-white text-dark p-4 rounded" style="margin-top: 20px">
     <div class="h4 font-weight-bold"> Give Rating </div>
     <form method="POST" class="form-inline">
         <div class="form-group mr-2">
@@ -38,14 +40,14 @@
     </form>
 </div>
 
-<div class="container" style="margin-top:30px;">
+<div class="container mt-1">
   <div class="row">
-    <!-- {% for rating in idea.ratings() %}
+    {% for rating in idea.ratings() %}
     <div class="col-sm-2 border border-dark text-dark bg-white rounded p-2">
         <div class="font-weight-bold">{{ rating.user() }}</div>
         Rating : {{ rating.value() }}
     </div>
-    {% endfor %} -->
+    {% endfor %}
   </div>
 </div>
 

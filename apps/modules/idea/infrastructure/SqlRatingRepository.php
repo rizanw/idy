@@ -1,112 +1,69 @@
-<?php 
+<?php
 
 namespace Idy\Idea\Infrastructure;
 
 use Phalcon\Db\Column;
-use Phalcon\Mvc\Model\Query;
-use Idy\Idea\Domain\Model\Author;
 use Idy\Idea\Domain\Model\Idea;
 use Idy\Idea\Domain\Model\IdeaId;
-use Idy\Idea\Domain\Model\IdeaRepository;
+use Idy\Idea\Domain\Model\Rating;
+use Idy\Idea\Domain\Model\RatingRepository;
 
-class SqlIdeaRepository implements RatingRepository
+class SqlRatingRepository implements RatingRepository
 {
-    private $ideas;
-    private $tableName;
     private $dbEngine;
+    private $tableName;
 
     public function __construct($di)
     {
-        $this->ideas = array();
-        $this->tableName = "ideas";
         $this->dbEngine = $di->get('db');
+        $this->tableName = "ratings";
     }
 
-    public function byId(IdeaId $id)
+    public function byIdeaId(IdeaId $id): array
     {
-
-    }
-    
-    public function isExist(IdeaId $id) : bool
-    {
-        $query = $this->dbEngine->prepare("SELECT 1 FROM {$this->tableName} WHERE id=:id;");
+        $query = $this->dbEngine->prepare(
+            "SELECT user, value
+            FROM {$this->tableName}
+            WHERE idea_id = :id"
+        );
+        $placeholders = [
+            "id" => $id->id()
+        ];
         $dataTypes = [
             "id" => Column::BIND_PARAM_STR
         ];
-        $dataValues = [
-            "id" => $id->id()
-        ];
-
-        $res = $this->dbEngine->executePrepared($query, $dataValues, $dataTypes);
-        $anyIdea = $res->fetch();
-
-        return $anyIdea;
+        $result = $this->dbEngine->executePrepared($query, $placeholders, $dataTypes);
+        $ratingRows = $result->fetchAll();
+        $ratings = array();
+        foreach ($ratingRows as $row) {
+            $rating = $this->buildRating($row);
+            array_push($ratings, $rating);
+        }
+        return $ratings;
     }
 
-    public function save(Idea $idea) : bool
+    public function save(Rating $rating, IdeaId $id): bool
     {
-        $query = "";
+        $placeholders = [
+            "ideaId" => $id->id(),
+            "user" => $rating->user(),
+            "value" => $rating->value()
+        ];
         $dataTypes = [
-            "id" => Column::BIND_PARAM_STR,
-            "title" => Column::BIND_PARAM_STR,
-            "description" => Column::BIND_PARAM_STR,
-            "authorName" => Column::BIND_PARAM_STR,
-            "authorEmail" => Column::BIND_PARAM_STR,
-            "votes" => Column::BIND_PARAM_INT
+            "ideaId" => Column::BIND_PARAM_STR,
+            "user" => Column::BIND_PARAM_STR,
+            "value" => Column::BIND_PARAM_INT,
         ];
-        $dataValues = [
-            "id" => $idea->id()->id(),
-            "title" => $idea->title(),
-            "description" => $idea->description(),
-            "authorName" => $idea->author()->name(),
-            "authorEmail" => $idea->author()->email(),
-            "votes" => $idea->votes()
-        ];
-        $isSuccessfullyExecuted = false;
-        $isExist = $this->isExist($idea->id());
-
-        if(!$isExist){
-            $query =
-                "INSERT INTO {$this->tableName}(id, title, description, author_name, author_email, votes)
-                VALUE (:id, :title, :description, :authorName, :authorEmail, :votes)";
-        }else{
-            $query =
-                "UPDATE {$this->tableName} SET
-                title=:title, description=:description, author_name=:authorName,
-                author_email=:authorEmail, votes=:votes
-                WHERE id = :id";
-        }
-
-        $isSuccessfullyExecuted = $this->dbEngine->execute($query, $dataValues, $dataTypes);
+        $query =
+            "INSERT INTO {$this->tableName}(idea_id, user, value) VALUE (:ideaId, :user, :value)";
+        $isSuccessfullyExecuted = $this->dbEngine->execute($query, $placeholders, $dataTypes);
         return $isSuccessfullyExecuted;
     }
 
-    public function allIdeas() : array
+    private function buildRating(array $row): Rating
     {
-        $query = "SELECT id, title, description, author_name, author_email, votes FROM {$this->tableName};";
-        $result = $this->dbEngine->query($query);
-        $ideaData = $result->fetchAll();
-        $ideas = array();
-        foreach ($ideaData as $val){
-            $idea = $this->buildIdea($val);
-            array_push($ideas, $idea);
-        }
-        return $ideas;
+        $rating = new Rating($row["user"], $row["value"]);
+        return $rating;
     }
 
-    public function buildIdea(array $val) : Idea
-    {
-        # code...
-        $ideaId = new IdeaId($val['id']);
-        $ideaAuthor = new Author($val['author_name'], $val['author_email']);
-        $idea = new Idea(
-            $ideaId,
-            $val['title'],
-            $val['description'],
-            $ideaAuthor,
-            $val['votes']
-        );
-        return $idea;
-    }
-    
 }

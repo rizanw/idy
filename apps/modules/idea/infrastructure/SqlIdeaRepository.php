@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Idy\Idea\Infrastructure;
 
@@ -24,10 +24,27 @@ class SqlIdeaRepository implements IdeaRepository
 
     public function byId(IdeaId $id)
     {
+        $query = $this->dbEngine->prepare(
+            "SELECT * FROM {$this->tableName} WHERE id = :id"
+        );
+        $dataTypes = [
+            "id" => Column::BIND_PARAM_STR
+        ];
+        $dataValues = [
+            "id" =>$id->id()
+        ];
 
+        $result = $this->dbEngine->executePrepared($query, $dataValues, $dataTypes);
+        $ideaRow = $result->fetch();
+
+        if ($ideaRow == false) {
+            return null;
+        }
+        $idea = $this->buildIdea($ideaRow);
+        return $idea;
     }
-    
-    public function isExist(IdeaId $id) : bool
+
+    public function isExist(IdeaId $id): bool
     {
         $query = $this->dbEngine->prepare("SELECT 1 FROM {$this->tableName} WHERE id=:id;");
         $dataTypes = [
@@ -40,10 +57,10 @@ class SqlIdeaRepository implements IdeaRepository
         $res = $this->dbEngine->executePrepared($query, $dataValues, $dataTypes);
         $anyIdea = $res->fetch();
 
-        return $anyIdea;
+        return !($anyIdea == false);
     }
 
-    public function save(Idea $idea) : bool
+    public function save(Idea $idea): bool
     {
         $query = "";
         $dataTypes = [
@@ -65,11 +82,11 @@ class SqlIdeaRepository implements IdeaRepository
         $isSuccessfullyExecuted = false;
         $isExist = $this->isExist($idea->id());
 
-        if(!$isExist){
+        if (!$isExist) {
             $query =
                 "INSERT INTO {$this->tableName}(id, title, description, author_name, author_email, votes)
                 VALUE (:id, :title, :description, :authorName, :authorEmail, :votes)";
-        }else{
+        } else {
             $query =
                 "UPDATE {$this->tableName} SET
                 title=:title, description=:description, author_name=:authorName,
@@ -81,32 +98,26 @@ class SqlIdeaRepository implements IdeaRepository
         return $isSuccessfullyExecuted;
     }
 
-    public function allIdeas() : array
+    public function allIdeas(): array
     {
         $query = "SELECT id, title, description, author_name, author_email, votes FROM {$this->tableName};";
         $result = $this->dbEngine->query($query);
         $ideaData = $result->fetchAll();
         $ideas = array();
-        foreach ($ideaData as $val){
+        foreach ($ideaData as $val) {
             $idea = $this->buildIdea($val);
             array_push($ideas, $idea);
         }
         return $ideas;
     }
 
-    public function buildIdea(array $val) : Idea
+    public function buildIdea(array $val): Idea
     {
         # code...
         $ideaId = new IdeaId($val['id']);
         $ideaAuthor = new Author($val['author_name'], $val['author_email']);
-        $idea = new Idea(
-            $ideaId,
-            $val['title'],
-            $val['description'],
-            $ideaAuthor,
-            $val['votes']
-        );
+        $idea = new Idea($ideaId, $val['title'], $val['description'], $ideaAuthor, $val['votes']);
         return $idea;
     }
-    
+
 }

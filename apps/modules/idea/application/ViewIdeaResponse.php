@@ -1,12 +1,11 @@
 <?php
-
 namespace Idy\Idea\Application;
+use Idy\Idea\Domain\Model\Idea;
 
-class VoteIdeaResponse
+class ViewIdeaResponse
 {
     public $idea;
-
-    public function __construct($idea)
+    public function __construct(Idea $idea)
     {
         $this->idea = $idea;
     }

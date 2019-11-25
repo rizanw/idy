@@ -7,7 +7,7 @@ class Rating
     private $user;
     private $value;
 
-    public function __construct($user, $value) 
+    public function __construct($user, $value)
     {
         $this->user = $user;
         $this->value = $value;
@@ -23,15 +23,15 @@ class Rating
         return $this->value;
     }
 
-    public function equals(Rating $rating) 
+    public function equals(Rating $rating)
     {
-        return $this->user === $rating->user() && 
-                $this->value === $rating->value();
+        return $this->user === $rating->user() &&
+            $this->value === $rating->value();
     }
 
-    public function isValid() 
+    public function isValid()
     {
-        if ($user && $value && $value > 0 && $value <= 5) {
+        if ($this->user && $this->value && $this->value > 0 && $this->value <= 5) {
             return true;
         }
         return false;
