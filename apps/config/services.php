@@ -50,6 +50,10 @@ $di['voltService'] = function($view, $di) use ($config) {
         "compiledExtension" => ".compiled",
         "compileAlways" => $compileAlways
     ));
+
+    $compiler = $volt->getCompiler();
+    $compiler->addFunction('in_array', 'in_array');
+
     return $volt;
 };
 

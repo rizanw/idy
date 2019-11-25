@@ -1,8 +1,6 @@
 <?php
-
 namespace Idy\Idea\Application;
-
-class VoteIdeaRequest
+class ViewIdeaRequest
 {
     public $id;
 
@@ -10,5 +8,4 @@ class VoteIdeaRequest
     {
         $this->id = $id;
     }
-
 }

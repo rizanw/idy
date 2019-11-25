@@ -2,14 +2,15 @@
 
 namespace Idy\Idea\Application;
 
+use Idy\Idea\Domain\Model\Author;
+use Idy\Idea\Domain\Model\Idea;
 use Idy\Idea\Domain\Model\IdeaRepository;
 
 class CreateNewIdeaService
 {
     private $ideaRepository;
 
-    public function __construct(
-        IdeaRepository $ideaRepository)
+    public function __construct(IdeaRepository $ideaRepository)
     {
         $this->ideaRepository = $ideaRepository;
     }
@@ -17,8 +18,13 @@ class CreateNewIdeaService
     public function execute(CreateNewIdeaRequest $request)
     {
         //$idea = new Idea();
+        $author = new Author($request->authorName, $request->authorEmail);
+        $idea = Idea::makeIdea($request->ideaTitle, $request->ideaDescription, $author);
+        
+        $this->ideaRepository->save($idea);
+        $response = new CreateNewIdeaResponse($idea);
 
-        //$this->ideaRepository->save($idea);
+        return $response;
     }
 
 }

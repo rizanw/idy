@@ -10,10 +10,10 @@ class IdeaId
 
     public function __construct($id = null)
     {
-        $this->id = $id ? : Uuid::uuid4()->toString();
+        $this->id = $id ?: Uuid::uuid4()->toString();
     }
 
-    public function id() 
+    public function id()
     {
         return $this->id;
     }

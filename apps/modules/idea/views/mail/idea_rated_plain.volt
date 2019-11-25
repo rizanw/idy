@@ -1,5 +1,5 @@
-Hi {{ name }},
+Hi %name%,
 
-Your idea #{{ id }} has been rated {{ rating }}.
+Your idea #%id% has been rated %rating%.
 
 Idy

@@ -2,16 +2,14 @@
 
 namespace Idy\Idea\Application;
 
-class RateIdeaRequest
+class SendRatingNotificationRequest
 {
-    public $ratingUser;
     public $ratingValue;
     public $ideaId;
 
-    public function __construct($ideaId, $ratingUser, $ratingValue)
+    public function __construct($ideaId, $ratingValue)
     {
         $this->ideaId = $ideaId;
-        $this->ratingUser = $ratingUser;
         $this->ratingValue = $ratingValue;
     }
 
