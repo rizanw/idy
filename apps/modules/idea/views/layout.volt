@@ -10,6 +10,15 @@
 
     <!-- Bootstrap core CSS -->
     <link href="{{ url('assets/css/bootstrap.min.css') }}" rel="stylesheet">
+    <style>
+        body{
+            font-family:arial,sans-serif;
+            font-size:100%;
+            margin:3em;
+            background:#666;
+            color:#fff;
+        }
+    </style>
 
     {% block styles %}{% endblock %}
 
@@ -29,7 +38,7 @@
         </div>
     </nav>
 
-    <main role="main" class="container">
+    <main role="main" class="container pt-4">
 
     {% block content %}{% endblock %}
 

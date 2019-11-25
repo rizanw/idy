@@ -43,21 +43,29 @@ $di['router'] = function() use ($defaultModule, $modules, $di, $config) {
 				'params'=> 1
 			));
 			
-			$router->add('/'. $moduleName . '/:controller/:params', array(
+			$router->add('/'. $moduleName . '/:action/:params', array(
 				'namespace' => $module['webControllerNamespace'],
 				'module' => $moduleName,
-				'controller' => 1,
-				'action' => isset($module['defaultAction']) ? $module['defaultAction'] : 'index',
+				'controller' => isset($module['defaultController']) ? $module['defaultController'] : 'index',
+				'action' => 1,
 				'params' => 2
 			));
 
-			$router->add('/'. $moduleName . '/:controller/:action/:params', array(
-				'namespace' => $module['webControllerNamespace'],
-				'module' => $moduleName,
-				'controller' => 1,
-				'action' => 2,
-				'params' => 3
-			));	
+			// $router->add('/'. $moduleName . '/:controller/:params', array(
+			// 	'namespace' => $module['webControllerNamespace'],
+			// 	'module' => $moduleName,
+			// 	'controller' => 1,
+			// 	'action' => isset($module['defaultAction']) ? $module['defaultAction'] : 'index',
+			// 	'params' => 2
+			// ));
+
+			// $router->add('/'. $moduleName . '/:controller/:action/:params', array(
+			// 	'namespace' => $module['webControllerNamespace'],
+			// 	'module' => $moduleName,
+			// 	'controller' => 1,
+			// 	'action' => 2,
+			// 	'params' => 3
+			// ));	
 
 			/**
 			 * Default API Module routing
