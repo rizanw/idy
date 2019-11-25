@@ -19,7 +19,7 @@ class CreateNewIdeaService
     {
         //$idea = new Idea();
         $author = new Author($request->authorName, $request->authorEmail);
-        $idea = Idea::makeIdea($request->ideaTitle, $request->ideaDescription, $author);
+        $idea = Idea::makeIdea($request->ideaTitle, $request->ideaDescription, $author, 0);
         
         $this->ideaRepository->save($idea);
         $response = new CreateNewIdeaResponse($idea);
